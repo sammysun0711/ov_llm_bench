@@ -1,0 +1,20 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+#openvino>=2023.2.0
+torch
+transformers==4.33.3
+tokenizers==0.13.3
+accelerate==0.21.0
+werkzeug==2.2.2
+numpy
+optimum==1.13.2
+git+https://github.com/huggingface/optimum-intel.git@cadfab708a87bf677ed52b7e7752a2a5b736fa94
+nncf
+onnx>=1.11.0
+onnxruntime
+tiktoken
+psutil
+einops
+huggingface_hub 
+hf_transfer
+auto-gptq==0.4.2
+transformers_stream_generator
