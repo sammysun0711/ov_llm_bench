@@ -1,5 +1,5 @@
 import time
-from transformers import AutoTokenizer, TextIteratorStreamer, AutoConfig
+from transformers import AutoTokenizer, TextIteratorStreamer, AutoConfig, GenerationConfig
 import gc
 from optimum.intel.openvino import OVModelForCausalLM
 from threading import Thread, Event
@@ -20,14 +20,15 @@ max_shared_mem_consumption = ''
 class InferenceEngine:
     def __init__(self, args=None, ov_config=None):
         self.args = args
-        self.tokenizer = AutoTokenizer.from_pretrained(
-            self.args.model_id, trust_remote_code=True)
-        s = time.time()
+
         self.config = AutoConfig.from_pretrained(
                 self.args.model_id, trust_remote_code=True)
-    
+        s = time.time()
         if self.config.model_type == "llama":
             print("Loading Llama2 model")
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.args.model_id, trust_remote_code=True)
+
             self.ov_model = OVModelForCausalLM.from_pretrained(self.args.model_id,
                                                                compile=False,
                                                                device=self.args.device,
@@ -36,6 +37,9 @@ class InferenceEngine:
 
         elif self.config.model_type == "chatglm":
             print("Loading ChatGLM2 model")
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.args.model_id, trust_remote_code=True)
+
             self.ov_model = OVChatGLM2Model.from_pretrained(self.args.model_id,
                                                             config=self.config,
                                                             compile=False,
@@ -45,12 +49,21 @@ class InferenceEngine:
 
         elif self.config.model_type == "qwen":
             print("Loading Qwen model")
+            self.tokenizer = AutoTokenizer.from_pretrained(
+                self.args.model_id,
+                pad_token='<|extra_0|>',
+                eos_token='<|endoftext|>',
+                padding_side='left',
+                trust_remote_code=True)
+
             self.ov_model = OVQwenModel.from_pretrained(self.args.model_id,
                                                         config=self.config,
                                                         compile=False,
                                                         device=self.args.device,
                                                         ov_config=ov_config,
+                                                        pad_token_id=self.tokenizer.pad_token_id,
                                                         trust_remote_code=True)
+            self.ov_model.generation_config = GenerationConfig.from_pretrained(self.args.model_id, pad_token_id=self.tokenizer.pad_token_id)
 
         print("read model time: {:.3f} s".format(time.time() - s))
 
@@ -143,8 +156,9 @@ class InferenceEngine:
 
     def build_inputs(self, query):
         prompt = None
-        system_message = "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions."
+
         if self.config.model_type == "llama":
+            system_message = "A chat between a curious user and an artificial intelligence assistant. The assistant gives helpful, detailed, and polite answers to the user's questions."
             prompt = f"<s>[INST] <<SYS>>\n{system_message}\n<</SYS>>\n\n{query} [/INST]"
 
         elif self.config.model_type == "chatglm":
@@ -153,6 +167,7 @@ class InferenceEngine:
         elif self.config.model_type == "qwen":
             im_start = "<|im_start|>"
             im_end = "<|im_end|>"
+            system_message = "You are a helpful assistant."
             query = query.lstrip("\n").rstrip()
             prompt = f"{im_start}system\n{system_message}{im_end}"
             prompt += f"\n{im_start}user\n{query}{im_end}\n{im_start}assistant\n"
