@@ -58,6 +58,22 @@ python convert.py --model_id Llama-2-7B-Chat-GPTQ/ --output_dir Llama-2-7B-Chat-
 python benchmark.py -m Llama-2-7B-Chat-GPTQ-OV/GPTQ_INT4-FP16 -d CPU -pl 9
 ```
 
+## ChatGLM3-6B-GPTQ-INT4
+### Download ChatGLM3-6B-GPTQ-INT4 Pytorch INT4-FP16 Model locally via HF mirror in PRC:
+```bash
+export HF_ENDPOINT=https://hf-mirror.com
+huggingface-cli download --resume-download ranchlai/chatglm3-6B-gptq-4bit --output_dir ChatGLM3-6B-GPTQ-INT4
+```
+
+### Convert ChatGLM3-6B-GPTQ-INT4 Pytorch Model to OpenVINO INT4-FP16 model
+```python
+python convert.py --model_id ChatGLM3-6B-GPTQ-INT4 --output_dir ChatGLM3-6B-GPTQ-INT4-OV --precision FP16
+```
+### Run benchmark with OpenVINO INT4-FP16 model with prompt length 9/32/256/512/1024 on intel CPU/GPU
+```python
+python benchmark.py -m ChatGLM3-6B-GPTQ-INT4-OV/GPTQ_INT4-FP16 -d CPU -pl 9
+```
+
 ## Qwen-7B-Chat-Int4
 ### Download Qwen-7B-Chat-Int4 Pytorch INT4-FP16 locally via HF mirror in PRC:
 ```

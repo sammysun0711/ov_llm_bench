@@ -576,6 +576,7 @@ def convert_qwen(args):
 converters = {
     'decoder': convert_causal_lm,
     'chatglm2': convert_chatglm2,
+    'chatglm3': convert_chatglm2,
     'qwen': convert_qwen,
 }
 

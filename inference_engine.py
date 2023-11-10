@@ -162,7 +162,11 @@ class InferenceEngine:
             prompt = f"<s>[INST] <<SYS>>\n{system_message}\n<</SYS>>\n\n{query} [/INST]"
 
         elif self.config.model_type == "chatglm":
-            prompt = f"[Round 0]\n\n问：{query}\n\n答：\n\n"
+            if "chatglm2" in self.args.model_id.lower():
+                prompt = f"[Round 0]\n\n问：{query}\n\n答：\n\n"
+            elif "chatglm3" in self.args.model_id.lower():
+                system_message = "You are ChatGLM3, a large language model trained by Zhipu.AI. Follow the user's instructions carefully. Respond using markdown."
+                prompt = f"<|system|>\n{system_message}\n<|user|>{query}<|assistant|>"
 
         elif self.config.model_type == "qwen":
             im_start = "<|im_start|>"
