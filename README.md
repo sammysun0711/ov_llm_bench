@@ -62,7 +62,7 @@ python benchmark.py -m Llama-2-7B-Chat-GPTQ-OV/GPTQ_INT4-FP16 -d CPU -pl 9
 ### Download ChatGLM3-6B-GPTQ-INT4 Pytorch INT4-FP16 Model locally via HF mirror in PRC:
 ```bash
 export HF_ENDPOINT=https://hf-mirror.com
-huggingface-cli download --resume-download ranchlai/chatglm3-6B-gptq-4bit --output_dir ChatGLM3-6B-GPTQ-INT4
+huggingface-cli download --resume-download ranchlai/chatglm3-6B-gptq-4bit --local-dir ChatGLM3-6B-GPTQ-INT4
 ```
 
 ### Convert ChatGLM3-6B-GPTQ-INT4 Pytorch Model to OpenVINO INT4-FP16 model
