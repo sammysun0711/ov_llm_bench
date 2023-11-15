@@ -1,7 +1,8 @@
 ## System Requirment
-This sample requires to download latest chatglm2-6b model from [hugging-face](https://hf-mirror.com/THUDM/chatglm2-6b) or [model scope](https://modelscope.cn/models/ZhipuAI/chatglm2-6b/summary)
-This task request Nvidia GPU for GPTQ quantization, GPU memory >= 12GB, we verified on following system
-Ubuntu 18.04, Nvidia 1080TI，Driver Version: 520.61.05, CUDA Version:11.8, GPU memory 24 GB
+This example has following dependency
+- Latest chatglm2-6b model from [hugging-face](https://hf-mirror.com/THUDM/chatglm2-6b) or [model scope](https://modelscope.cn/models/ZhipuAI/chatglm2-6b/summary)
+- Request Nvidia GPU for GPTQ quantization, GPU memory >= 12GB
+- Verified system: Ubuntu 18.04, Nvidia 1080TI，Driver Version: 520.61.05, CUDA Version:11.8, GPU memory 24 GB
 
 
 ## Setup Environment
@@ -17,7 +18,7 @@ python -m pip install -r requirements.txt
 python download_chatglm2_6b.py
 ```
 
-## Run GPTQ INT4 Quantization on GPU
+## Run GPTQ INT4 Quantization on Nvidia GPU
 ```python
 python run_chatglm2_gptq.py --model_id ZhipuAI/chatglm2-6b --output_dir ChatGLM2-GPTQ-INT4
 ```
