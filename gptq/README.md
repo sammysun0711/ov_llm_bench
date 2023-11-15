@@ -3,7 +3,9 @@ This example has following requirements
 - Latest chatglm2-6b model from [hugging-face](https://hf-mirror.com/THUDM/chatglm2-6b) or [model scope](https://modelscope.cn/models/ZhipuAI/chatglm2-6b/summary)
 - Request Nvidia GPU for GPTQ quantization, GPU memory >= 12GB
 - Verified system: Ubuntu 18.04, Nvidia 1080TI，Driver Version: 520.61.05, CUDA Version:11.8, GPU memory 24 GB
+- Transformer 4.35.0, optimum 1.14.0, auto-gptp 0.5.1, optimum-intel 1.13.0.dev0
 
+So this python environment is not compatible with `ov_llm_bench` for model conversion and benchmark, please create new python environment for better environment maintenance
 
 ## Setup Environment
 ```bash
