@@ -1,0 +1,8 @@
+huggingface_hub
+transformers==4.35.0
+optimum==1.14.0
+git+https://github.com/huggingface/optimum-intel@f248835b16ce4ec054d6d4d629dff4213fe94157
+auto-gptq==0.5.1
+torch==2.0.0
+tokenizers==0.14.0
+modelscope>=1.9.0
