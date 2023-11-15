@@ -30,6 +30,8 @@ cp ZhipuAI/chatglm2-6b/tokenizer_config.json ChatGLM2-GPTQ-INT4/
 cp ZhipuAI/chatglm2-6b/tokenization_chatglm.py ChatGLM2-GPTQ-INT4/
 ```
 
-Please note, ChatGLM2 tokenzier has issue with tranformer 4.35.0 to save tokenizer via `tokenizer.save_pretrained(args.output_dir)`: [Issue 152](https://github.com/THUDM/ChatGLM3/issues/152), [Issue 199](https://github.com/InternLM/xtuner/issues/199).
-Because GPTQ method dose not change tokenzier itself. So we manually copy tokenzier related files from original chatglm2-6b to quantized ChatGLM2-GPTQ-INT4
+Please note, ChatGLM2 tokenzier has issue with tranformer 4.35.0 to save tokenizer via `tokenizer.save_pretrained(args.output_dir)`: [Issue 152](https://github.com/THUDM/ChatGLM3/issues/152), [Issue 199](https://github.com/InternLM/xtuner/issues/199)
+
+Because GPTQ method only apply to pytorch model, tokenzier itself remain unchanged. So we manually copy tokenzier related files from original chatglm2-6b to quantized ChatGLM2-GPTQ-INT4
+
 
