@@ -70,8 +70,8 @@ if __name__ == "__main__":
 
     if "GPU" in args.device.upper():
         ov_config = {properties.cache_dir(): args.cache_dir,
-                     properties.intel_gpu.hint.queue_throttle(): properties.intel_gpu.hint.ThrottleLevel.HIGH,
-                     properties.intel_gpu.hint.queue_priority(): properties.hint.Priority.HIGH,
+                     properties.intel_gpu.hint.queue_throttle(): properties.intel_gpu.hint.ThrottleLevel.MEDIUM,
+                     properties.intel_gpu.hint.queue_priority(): properties.hint.Priority.MEDIUM,
                      properties.intel_gpu.hint.host_task_priority(): properties.hint.Priority.HIGH,
                      properties.hint.enable_cpu_pinning(): args.enable_enable_cpu_pinning,
                      properties.enable_profiling(): args.enable_perf_profiling,
