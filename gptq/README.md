@@ -23,7 +23,7 @@ python download_chatglm2_6b.py
 python run_chatglm2_gptq.py --model_id ZhipuAI/chatglm2-6b --output_dir ChatGLM2-GPTQ-INT4
 ```
 
-## Copy tokenzier related files from original chatglm2-6b to quantized ChatGLM2-GPTQ-INT4
+## Copy tokenzier related files from chatglm2-6b to ChatGLM2-GPTQ-INT4
 ```bash
 cp ZhipuAI/chatglm2-6b/tokenizer.model ChatGLM2-GPTQ-INT4/
 cp ZhipuAI/chatglm2-6b/tokenizer_config.json ChatGLM2-GPTQ-INT4/
