@@ -54,6 +54,9 @@ if __name__ == "__main__":
         '-pp', '--enable_perf_profiling', default=False, type=bool, help="Whether to enable OpenVINO performance profiling")
     parser.add_argument(
         '-pt', '--use_prompt_template', default=True, type=bool, help="Whether to use model related prompt template")
+    parser.add_argument(
+        '-l', '--language', default="english", type=str, help="Specifiy to use which language for test input prompt, avaliable option inculde 'english', 'en', 'chinese', ch")
+
     #parser.add_argument(
     #    '-mp', '--enable_mem_profiling', default=False, type=bool, help="Whether to enable memory profiling") # Not work now, need to fix
     
@@ -81,8 +84,10 @@ if __name__ == "__main__":
     # Warm up
     if args.prompt: engine.generate(args.prompt) 
     prompt = None
-    prompt = english_sentence[str(args.prompt_length)]
-    #prompt = chinese_sentence[str(args.prompt_length)]
+    if args.language.lower() == "english" or args.language.lower() == "en":
+        prompt = english_sentence[str(args.prompt_length)]
+    elif args.language.lower() == "chinese" or args.language.lower() == "ch":
+        prompt = chinese_sentence[str(args.prompt_length)]
     engine.generate(prompt)
     if args.enable_perf_profiling:
         total_sorted_list = engine.get_profiling_data()
