@@ -38,12 +38,14 @@ class InferenceEngine:
         elif self.config.model_type == "chatglm":
             print("Loading ChatGLM2 model")
             self.tokenizer = AutoTokenizer.from_pretrained(
-                self.args.model_id, trust_remote_code=True)
-
+                self.args.model_id,
+                padding_side='left',
+                trust_remote_code=True)
             self.ov_model = OVChatGLM2Model.from_pretrained(self.args.model_id,
                                                             config=self.config,
                                                             compile=False,
                                                             device=self.args.device,
+                                                            pad_token_id=self.tokenizer.pad_token_id,
                                                             ov_config=ov_config,
                                                             trust_remote_code=True)
 
@@ -195,12 +197,7 @@ class InferenceEngine:
           update for performance text field
           update for a total number of tokens
         """
-        current_tokens = self.tokenizer.encode(
-            '$' + new_gen_text, add_special_tokens=False)
-        special_token = self.tokenizer.encode('$', add_special_tokens=False)
-        if current_tokens[0] == special_token[0]:
-            current_tokens = current_tokens[1:]
-
+        current_tokens = self.tokenizer.encode(new_gen_text, add_special_tokens=False)
         num_current_toks = len(current_tokens)
 
         num_tokens += num_current_toks
