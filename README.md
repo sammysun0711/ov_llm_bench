@@ -74,6 +74,7 @@ python convert.py --model_id ChatGLM3-6B-GPTQ-INT4 --output_dir ChatGLM3-6B-GPTQ
 python benchmark.py -m ChatGLM3-6B-GPTQ-INT4-OV/GPTQ_INT4-FP16 -d CPU -pl 9
 ```
 
+For ChatGLM2 GPTQ INT4 model support, here is a [gptq quantization example](https://github.com/sammysun0711/ov_llm_bench/tree/main/gptq) to run GPTQ INT4 quatization on original FP16 ChatGLM model with GPU. Then quantized ChatGLM2 GPTQ INT4 model can be converted with `convert.py` script to OpenVINO model.
 ## Qwen-7B-Chat-Int4
 ### Download Qwen-7B-Chat-Int4 Pytorch INT4-FP16 locally via HF mirror in PRC:
 ```
