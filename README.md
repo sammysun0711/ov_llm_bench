@@ -2,8 +2,7 @@
 OpenVINO LLM Benchmark, including model conversion and benchmark script, required minimum openvino version>=2023.2
 
 
-## Setup Environment
-### Setup Python Environment
+## Setup Python Environment
 ```bash
 conda create -n ov_llm_bench python=3.10
 conda activate ov_llm_bench
@@ -76,7 +75,7 @@ python benchmark.py -m Qwen-7B-Chat-Int4-OV/GPTQ_INT4-FP16 -d CPU -pl 9
 ```
 
 
-#### OpenVINO nightly build
+## OpenVINO nightly build
 In case you want try out latest openvino nightly build, Please note, nightly build provide feature preview, which is not go through the whole validation process, which may not reach product quality.
 
 #### PYPI
@@ -85,7 +84,7 @@ python -m pip install -U pip
 python -m pip install openvino-nightly
 ```
 #### Bulid OpenVINO github master from source
-Build OpenVINO on Linux:
+##### Build OpenVINO on Linux:
 ```bash
 git clone https://github.com/openvinotoolkit/openvino.git
 cd openvino && git submodule update --init --recursive
@@ -101,7 +100,7 @@ cd <ov install dir>/tools/
 python -m pip install  openvino*.whl
 ```
 
-Build OpenVINO on Windows:
+##### Build OpenVINO on Windows:
 ```bash
 git clone https://github.com/openvinotoolkit/openvino.git
 cd openvino && git submodule update --init --recursive
