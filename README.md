@@ -70,14 +70,13 @@ python benchmark.py -m Qwen-7B-Chat-Int4-OV/GPTQ_INT4-FP16 -d CPU -pl 9
 ```
 
 ### OpenVINO nightly build
+In case you want try out latest openvino nightly build, Please note, nightly build provide feature preview, which is not go through the whole validation process, which may not reach product quality.
+
 #### PYPI
 ```
 python -m pip install -U pip
 python -m pip install openvino-nightly
 ```
-
-In case you want try out latest openvino nightly build, Please note, nightly build provide feature preview, which is not go through the whole validation process, which may not reach product quality.
-
 #### Bulid OpenVINO github master from source
 ##### Build OpenVINO on Linux:
 ```bash
