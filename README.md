@@ -1,6 +1,7 @@
 # ov_llm_bench
 OpenVINO LLM Benchmark, including model conversion and benchmark script, required minimum openvino version>=2023.2
 
+
 ## Setup Environment
 ### Setup Python Environment
 ```bash
@@ -8,6 +9,7 @@ conda create -n ov_llm_bench python=3.10
 conda activate ov_llm_bench
 pip install -r requirements.txt
 ```
+
 
 ## Llama-2-7B-Chat-GPTQ
 ### Download Llama-2-7B-Chat-GPTQ Pytorch INT4-FP16 Model locally via HF mirror in PRC:
@@ -26,6 +28,7 @@ python convert.py --model_id Llama-2-7B-Chat-GPTQ/ --output_dir Llama-2-7B-Chat-
 python benchmark.py -m Llama-2-7B-Chat-GPTQ-OV/GPTQ_INT4-FP16 -d CPU -pl 9
 ```
 
+
 ## ChatGLM3-6B-GPTQ-INT4
 ### Download ChatGLM3-6B-GPTQ-INT4 Pytorch INT4-FP16 Model locally via HF mirror in PRC:
 ```bash
@@ -43,6 +46,8 @@ python benchmark.py -m ChatGLM3-6B-GPTQ-INT4-OV/GPTQ_INT4-FP16 -d CPU -pl 9
 ```
 
 For ChatGLM2 GPTQ INT4 model support, here is a [gptq quantization example](https://github.com/sammysun0711/ov_llm_bench/tree/main/gptq) to run GPTQ INT4 quatization on original FP16 ChatGLM model with GPU. Then quantized ChatGLM2 GPTQ INT4 model can be converted with `convert.py` script to OpenVINO model.
+
+
 ## Qwen-7B-Chat-Int4
 ### Download Qwen-7B-Chat-Int4 Pytorch INT4-FP16 locally via HF mirror in PRC:
 ```
@@ -68,6 +73,7 @@ cp Qwen-7B-Chat-Int4/generation_config.json Qwen-7B-Chat-Int4-OV/GPTQ_INT4-FP16
 ```python
 python benchmark.py -m Qwen-7B-Chat-Int4-OV/GPTQ_INT4-FP16 -d CPU -pl 9
 ```
+
 
 ### OpenVINO nightly build
 In case you want try out latest openvino nightly build, Please note, nightly build provide feature preview, which is not go through the whole validation process, which may not reach product quality.
