@@ -1,44 +1,12 @@
 # ov_llm_bench
 OpenVINO LLM Benchmark, including model conversion and benchmark script, required minimum openvino version>=2023.2
 
-
 ## Setup Environment
 ### Setup Python Environment
 ```bash
 conda create -n ov_llm_bench python=3.10
 conda activate ov_llm_bench
 pip install -r requirements.txt
-```
-### Build OpenVINO 2023.2 github master on Linux:
-```bash
-git clone https://github.com/openvinotoolkit/openvino.git
-cd openvino && git submodule update --init --recursive 
-python -m pip install -U pip 
-python -m pip install -r ./src/bindings/python/src/compatibility/openvino/requirements-dev.txt
-python -m pip install -r ./src/bindings/python/wheel/requirements-dev.txt
-python -m pip install -r ./src/bindings/python/requirements.txt
-mkdir build && cd build
-cmake -DENABLE_INTEL_GNA=OFF -DENABLE_PYTHON=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<ov install dir> ..
-make --jobs=$(nproc --all)
-make install
-cd <ov install dir>/tools/
-python -m pip install  openvino*.whl
-```
-
-### Build OpenVINO 2023.2 github master on Windows:
-```bash
-git clone https://github.com/openvinotoolkit/openvino.git
-cd openvino && git submodule update --init --recursive
-python -m pip install -U pip
-python -m pip install -r ./src/bindings/python/src/compatibility/openvino/requirements-dev.txt
-python -m pip install -r ./src/bindings/python/wheel/requirements-dev.txt
-python -m pip install -r ./src/bindings/python/requirements.txt
-mkdir build && cd build
-cmake -G "Visual Studio 17 2022" -DENABLE_INTEL_GNA=OFF -DENABLE_PYTHON=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<ov install dir> ..
-cmake --build . --config Release --verbose -j8
-cmake --install .
-cd <ov install dir>/tools/
-python -m pip install openvino*.whl
 ```
 
 ## Llama-2-7B-Chat-GPTQ
@@ -92,8 +60,53 @@ SUPPORT_TORCH2=False
 ```python
 python convert.py --model_id Qwen-7B-Chat-Int4 --output_dir Qwen-7B-Chat-Int4-OV --precision FP16 
 ```
-
+### Copy generation_config.json to Qwen-7B-Chat-Int4-OV
+```bash
+cp Qwen-7B-Chat-Int4/generation_config.json Qwen-7B-Chat-Int4-OV/GPTQ_INT4-FP16
+```
 ### Run benchmark with OpenVINO INT4-FP16 model with prompt length 9/32/256/512/1024 on intel CPU/GPU
 ```python
 python benchmark.py -m Qwen-7B-Chat-Int4-OV/GPTQ_INT4-FP16 -d CPU -pl 9
+```
+
+### OpenVINO nightly build
+#### PYPI
+```
+python -m pip install -U pip
+python -m pip install openvino-nightly
+```
+
+In case you want try out latest openvino nightly build, Please note, nightly build may not reach product quality.
+
+#### Bulid OpenVINO github master from source
+##### Build OpenVINO on Linux:
+```bash
+git clone https://github.com/openvinotoolkit/openvino.git
+cd openvino && git submodule update --init --recursive
+python -m pip install -U pip
+python -m pip install -r ./src/bindings/python/src/compatibility/openvino/requirements-dev.txt
+python -m pip install -r ./src/bindings/python/wheel/requirements-dev.txt
+python -m pip install -r ./src/bindings/python/requirements.txt
+mkdir build && cd build
+cmake -DENABLE_INTEL_GNA=OFF -DENABLE_PYTHON=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<ov install dir> ..
+make --jobs=$(nproc --all)
+make install
+cd <ov install dir>/tools/
+python -m pip install  openvino*.whl
+```
+
+##### Build OpenVINO on Windows:
+```bash
+git clone https://github.com/openvinotoolkit/openvino.git
+cd openvino && git submodule update --init --recursive
+python -m pip install -U pip
+python -m pip install -r ./src/bindings/python/src/compatibility/openvino/requirements-dev.txt
+python -m pip install -r ./src/bindings/python/wheel/requirements-dev.txt
+python -m pip install -r ./src/bindings/python/requirements.txt
+mkdir build && cd build
+cmake -G "Visual Studio 17 2022" -DENABLE_INTEL_GNA=OFF -DENABLE_PYTHON=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<ov install dir> ..
+cmake --build . --config Release --verbose -j8
+cmake --install .
+cd <ov install dir>/tools/
+python -m pip install openvino*.whl
 ```

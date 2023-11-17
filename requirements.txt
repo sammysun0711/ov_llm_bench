@@ -1,5 +1,6 @@
 --extra-index-url https://download.pytorch.org/whl/cpu
-#openvino>=2023.2.0
+openvino>=2023.2.0
+openvino-dev>=2023.2.0
 torch
 transformers==4.33.3
 tokenizers==0.13.3
