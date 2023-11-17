@@ -76,7 +76,7 @@ python -m pip install -U pip
 python -m pip install openvino-nightly
 ```
 
-In case you want try out latest openvino nightly build, Please note, nightly build may not reach product quality.
+In case you want try out latest openvino nightly build, Please note, nightly build provide feature preview, which is not go through the whole validation process, which may not reach product quality.
 
 #### Bulid OpenVINO github master from source
 ##### Build OpenVINO on Linux:
