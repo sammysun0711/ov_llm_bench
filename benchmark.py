@@ -56,7 +56,7 @@ if __name__ == "__main__":
         '-pt', '--use_prompt_template', default=True, type=bool, help="Whether to use model related prompt template")
     parser.add_argument(
         '-l', '--language', default="english", type=str, help="Specifiy to use which language for test input prompt, avaliable option inculde 'english', 'en', 'chinese', ch")
-
+    parser.add_argument("--bf16", action="store_true", help="Whether to enable bf16 inference precision on SPR or later Xeon platform")
     #parser.add_argument(
     #    '-mp', '--enable_mem_profiling', default=False, type=bool, help="Whether to enable memory profiling") # Not work now, need to fix
     
@@ -68,6 +68,7 @@ if __name__ == "__main__":
                      properties.hint.scheduling_core_type(): properties.hint.SchedulingCoreType.PCORE_ONLY,
                      properties.hint.enable_hyper_threading(): args.enable_hyper_threading,
                      properties.hint.enable_cpu_pinning(): args.enable_enable_cpu_pinning,
+                     properties.hint.inference_precision(): "bf16" if args.bf16 else "f32",
                      properties.enable_profiling(): args.enable_perf_profiling,
                      }
 
