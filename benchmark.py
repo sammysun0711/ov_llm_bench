@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-tp', '--top_p', default=0.92, type=float, help="Top P for text generation")
     parser.add_argument(
-        '-ds', '--do_sample', default=True, type=bool, help="Wether do sample for text generation")
+        '-ds', '--do_sample', default=1, type=int, help="Wether do sample for text generation")
     parser.add_argument(
         '-t', '--temperature', default=0.1, type=float, help="Temperature for text generation")
     parser.add_argument(
@@ -45,15 +45,15 @@ if __name__ == "__main__":
     parser.add_argument(
         '-rp', '--repetition_penalty', default=1.0, type=float, help="Penalize tokens based on how frequently they occur in the text, default 1 means no penalty")
     parser.add_argument(
-        '-cb', '--enable_enable_cpu_pinning', default=True, type=bool, help="Whether to enable OpenVINO cpu pinning")
+        '-cb', '--enable_cpu_pinning', default=1, type=int, help="Whether to enable OpenVINO cpu pinning")
     parser.add_argument(
-        '-ht', '--enable_hyper_threading', default=False, type=bool, help="Whether to enable OpenVINO CPU hyper threading")
+        '-ht', '--enable_hyper_threading', default=0, type=int, help="Whether to enable OpenVINO CPU hyper threading")
     parser.add_argument(
         '-cd', '--cache_dir', default="model_cache", type=str, help="Cache diretory to save OpenVINO model cache")
     parser.add_argument(
-        '-pp', '--enable_perf_profiling', default=False, type=bool, help="Whether to enable OpenVINO performance profiling")
+        '-pp', '--enable_perf_profiling', default=0, type=int, help="Whether to enable OpenVINO performance profiling")
     parser.add_argument(
-        '-pt', '--use_prompt_template', default=True, type=bool, help="Whether to use model related prompt template")
+        '-pt', '--use_prompt_template', default=1, type=int, help="Whether to use model related prompt template")
     parser.add_argument(
         '-l', '--language', default="english", type=str, help="Specifiy to use which language for test input prompt, avaliable option inculde 'english', 'en', 'chinese', ch")
     parser.add_argument("--bf16", action="store_true", help="Whether to enable bf16 inference precision on SPR or later Xeon platform")
@@ -66,10 +66,10 @@ if __name__ == "__main__":
     if "CPU" in args.device.upper():
         ov_config = {properties.cache_dir(): args.cache_dir,
                      properties.hint.scheduling_core_type(): properties.hint.SchedulingCoreType.PCORE_ONLY,
-                     properties.hint.enable_hyper_threading(): args.enable_hyper_threading,
-                     properties.hint.enable_cpu_pinning(): args.enable_enable_cpu_pinning,
+                     properties.hint.enable_hyper_threading(): True if args.enable_hyper_threading else False,
+                     properties.hint.enable_cpu_pinning(): True if args.enable_cpu_pinning else False,
                      properties.hint.inference_precision(): "bf16" if args.bf16 else "f32",
-                     properties.enable_profiling(): args.enable_perf_profiling,
+                     properties.enable_profiling(): "YES" if args.enable_perf_profiling else "NO",
                      }
 
     if "GPU" in args.device.upper():
@@ -77,8 +77,8 @@ if __name__ == "__main__":
                      properties.intel_gpu.hint.queue_throttle(): properties.intel_gpu.hint.ThrottleLevel.MEDIUM,
                      properties.intel_gpu.hint.queue_priority(): properties.hint.Priority.MEDIUM,
                      properties.intel_gpu.hint.host_task_priority(): properties.hint.Priority.HIGH,
-                     properties.hint.enable_cpu_pinning(): args.enable_enable_cpu_pinning,
-                     properties.enable_profiling(): args.enable_perf_profiling,
+                     properties.hint.enable_cpu_pinning(): True if args.enable_cpu_pinning else False,
+                     properties.enable_profiling(): "YES" if args.enable_perf_profiling else "NO",
                      }
     print(f"OpenVINO version: {get_version()}\nargs: {args}\nov_config: {ov_config}")
     engine = InferenceEngine(args, ov_config)
