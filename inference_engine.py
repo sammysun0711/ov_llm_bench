@@ -80,7 +80,7 @@ class InferenceEngine:
         print("Original input text: ", text)
         if self.args.use_prompt_template:
             text = self.build_inputs(text)
-            print("Updated input text with model specific prompt template:\n ", text)
+            print("Updated input text with model specific prompt template:\n", text)
         prompt=text
         self.model_inputs = self.tokenizer(prompt, return_tensors="pt")
         self.model_inputs.pop("token_type_ids", None)
