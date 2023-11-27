@@ -82,14 +82,17 @@ if __name__ == "__main__":
                      }
     print(f"OpenVINO version: {get_version()}\nargs: {args}\nov_config: {ov_config}")
     engine = InferenceEngine(args, ov_config)
-    # Warm up
-    if args.prompt: engine.generate(args.prompt) 
-    prompt = None
-    if args.language.lower() == "english" or args.language.lower() == "en":
-        prompt = english_sentence[str(args.prompt_length)]
-    elif args.language.lower() == "chinese" or args.language.lower() == "ch":
-        prompt = chinese_sentence[str(args.prompt_length)]
-    engine.generate(prompt)
+    # Use user input prmpt 
+    if args.prompt: 
+        engine.generate(args.prompt)
+    # Use predefined input prompt
+    else:
+        prompt = None
+        if args.language.lower() == "english" or args.language.lower() == "en":
+            prompt = english_sentence[str(args.prompt_length)]
+        elif args.language.lower() == "chinese" or args.language.lower() == "ch":
+            prompt = chinese_sentence[str(args.prompt_length)]
+        engine.generate(prompt)
     if args.enable_perf_profiling:
         total_sorted_list = engine.get_profiling_data()
     del engine
