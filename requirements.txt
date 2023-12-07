@@ -2,13 +2,13 @@
 openvino>=2023.2.0
 openvino-dev>=2023.2.0
 torch
-transformers==4.33.3
-tokenizers==0.13.3
-accelerate==0.21.0
-werkzeug==2.2.2
+transformers==4.34.0
+tokenizers==0.14.1
+accelerate
+werkzeug
 numpy
-optimum==1.13.2
-git+https://github.com/huggingface/optimum-intel.git@cadfab708a87bf677ed52b7e7752a2a5b736fa94
+optimum==1.14.1
+git+https://github.com/huggingface/optimum-intel.git@f248835b16ce4ec054d6d4d629dff4213fe94157
 nncf
 onnx>=1.11.0
 onnxruntime
@@ -17,5 +17,5 @@ psutil
 einops
 huggingface_hub 
 hf_transfer
-auto-gptq==0.4.2
+auto-gptq==0.5.1
 transformers_stream_generator

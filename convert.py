@@ -378,9 +378,10 @@ def convert_chatglm2(args):
         def generate(self, input_name: str, framework: str = "pt", int_dtype: str = "int64", float_dtype: str = "fp32"):
             input = super().generate(input_name, framework, int_dtype, float_dtype)
             if input_name == "attention_mask":
-                input = torch.ones((input.shape[0], input.shape[1] + 1), dtype=input.dtype)
+                input = torch.ones(input.shape, dtype=input.dtype)
             if input_name == "position_ids":
-                input = torch.range(0, input.shape[1] + 1, dtype=input.dtype).repeat(1, 1)
+                bs = input.shape[0]
+                input = torch.range(0, input.shape[1], dtype=input.dtype).repeat(bs, 1)
             return input
 
     class ChatGLM2DummyPastKeyValuesGenerator(DummyPastKeyValuesGenerator):
@@ -432,6 +433,52 @@ def convert_chatglm2(args):
         DUMMY_PKV_GENERATOR_CLASS = ChatGLM2DummyPastKeyValuesGenerator
         no_position_ids = False
 
+        def generate_dummy_inputs(self, framework: str = "pt", **kwargs):
+            dummy_inputs_generators = self._create_dummy_input_generator_classes(**kwargs)
+
+            dummy_inputs = {}
+            input_names = [key for key in self.inputs.keys() if not key.startswith("past_key_values")]
+            if self.use_past_in_inputs and self.use_cache_branch is not False:
+                input_names.append("past_key_values")
+
+            for input_name in input_names:
+                input_was_inserted = False
+                for dummy_input_gen in dummy_inputs_generators:
+                    if dummy_input_gen.supports_input(input_name):
+                        dummy_inputs[input_name] = self.overwrite_shape_and_generate_input(
+                            dummy_input_gen,
+                            input_name,
+                            framework,
+                            input_shapes=kwargs,
+                        )
+                        input_was_inserted = True
+                        break
+                if not input_was_inserted:
+                    raise RuntimeError(
+                        f'Could not generate dummy input for "{input_name}". Try adding a proper dummy input generator to the model ONNX config.'
+                    )
+
+            # refer to https://github.com/huggingface/optimum/pull/764
+            cond1 = self.use_past_in_inputs
+            cond2 = self.PAD_ATTENTION_MASK_TO_PAST
+            cond3 = self.use_cache_branch is not False
+            cond4 = "attention_mask" in dummy_inputs
+            if (cond1 and cond2 and cond3 and cond4):
+                # Obtain the past sequence length from the value instead of the key (Bloom).
+                past_length = dummy_inputs["past_key_values"][0][1].shape[0]
+                for k, v in dummy_inputs.items():
+                    if k not in ["attention_mask", "past_key_values"]:
+                        dummy_inputs[k] = v[:, -1:]
+
+                dummy_inputs["attention_mask"] = DummyInputGenerator.pad_input_on_dim(
+                    dummy_inputs["attention_mask"],
+                    desired_length=past_length + 1,
+                    dim=1,
+                    dtype=dummy_inputs["attention_mask"].dtype,
+                )
+
+            return dummy_inputs
+
         @property
         def inputs(self) -> Dict[str, Dict[int, str]]:
             common_inputs = super().inputs
@@ -470,8 +517,12 @@ def convert_chatglm2(args):
         args.model_id,
         trust_remote_code=True,
         config=config,
+        torch_dtype=torch.float32
     )
-    pt_model.to(torch.float32)
+    try:
+        pt_model.to(torch.float32)
+    except Exception:
+        pass
 
     NormalizedConfigManager._conf[pt_model.config.model_type] = NormalizedTextConfig.with_args(
         num_layers="num_hidden_layers", num_attention_heads="num_attention_heads"
@@ -537,19 +588,41 @@ def convert_qwen(args):
     revision = "c02ede58c0ab0045f5e4788c35842bec6a7baa0a" if post_init is not None else "2abd8e5777bb4ce9c8ab4be7dbbd0fe4526db78d"
     normalized_config = NormalizedTextConfig.with_args(num_layers='num_hidden_layers', num_attention_heads='num_attention_heads', hidden_size='hidden_size')
     model = AutoModelForCausalLM.from_pretrained(args.model_id, trust_remote_code=True, torch_dtype=torch.float32, revision=revision)
-    model.to(torch.float32)
+    try:
+        model.to(torch.float32)
+    except Exception:
+        pass
+
+    class QwenDummyInputsGenerator(DummyTextInputGenerator):
+        SUPPORTED_INPUT_NAMES = {
+            "input_ids",
+            "attention_mask",
+            "token_type_ids",
+            "position_ids",
+        }
+
+        def generate(self, input_name: str, framework: str = "pt", int_dtype: str = "int64", float_dtype: str = "fp32"):
+            input = super().generate(input_name, framework, int_dtype, float_dtype)
+            if input_name == "input_ids":
+                input = torch.tensor([[1583]])
+            if input_name == "attention_mask":
+                input = torch.ones((1, 7), dtype=input.dtype)
+            if input_name == "position_ids":
+                input = torch.tensor([[6]])
+            return input
+
     class QwenDummyPastKeyValuesGenerator(DummyPastKeyValuesGenerator):
         def generate(self, input_name: str, framework: str = "pt", int_dtype: str = "int64", float_dtype: str = "fp32"):
             shape = (
-                self.batch_size,
-                self.sequence_length,
+                1,
+                6,
                 self.num_attention_heads,
                 self.hidden_size // self.num_attention_heads,
             )
             return [
                 (
-                    self.random_float_tensor(shape, framework=framework, dtype=float_dtype),
-                    self.random_float_tensor(shape, framework=framework, dtype=float_dtype),
+                    torch.zeros(shape, dtype=torch.float32),
+                    torch.zeros(shape, dtype=torch.float32),
                 )
                 for _ in range(self.num_layers)
             ]
@@ -557,7 +630,7 @@ def convert_qwen(args):
     class QwenOpenVINOConfig(TextDecoderOnnxConfig):
         DEFAULT_ONNX_OPSET = 13
         NORMALIZED_CONFIG_CLASS = normalized_config
-        DUMMY_INPUT_GENERATOR_CLASSES = (DummyTextInputGenerator, QwenDummyPastKeyValuesGenerator)
+        DUMMY_INPUT_GENERATOR_CLASSES = (QwenDummyInputsGenerator, QwenDummyPastKeyValuesGenerator)
         DUMMY_PKV_GENERATOR_CLASS = QwenDummyPastKeyValuesGenerator
 
         def generate_dummy_inputs(self, framework: str = "pt", **kwargs):
@@ -586,12 +659,11 @@ def convert_qwen(args):
                     )
 
             # refer to https://github.com/huggingface/optimum/pull/764
-            if (
-                self.use_past_in_inputs
-                and self.PAD_ATTENTION_MASK_TO_PAST
-                and self.use_cache_branch is not False
-                and "attention_mask" in dummy_inputs
-            ):
+            cond1 = self.use_past_in_inputs
+            cond2 = self.PAD_ATTENTION_MASK_TO_PAST
+            cond3 = self.use_cache_branch is not False
+            cond4 = "attention_mask" in dummy_inputs
+            if (cond1 and cond2 and cond3 and cond4):
                 # Obtain the past sequence length from the value instead of the key (Bloom).
                 past_length = dummy_inputs["past_key_values"][0][1].shape[1]
 
@@ -607,6 +679,7 @@ def convert_qwen(args):
         def add_past_key_values(self, inputs_or_outputs: Dict[str, Dict[int, str]], direction: str):
             """
             Fills `input_or_outputs` mapping with past_key_values dynamic axes considering the direction.
+
             Args:
                 inputs_or_outputs (`Dict[str, Dict[int, str]]`): The mapping to fill.
                 direction (`str`):
